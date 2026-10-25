@@ -1,0 +1,52 @@
+// Optional developer regression. Uses a fresh output namespace; decisions are synthetic.
+import {createRequire} from 'node:module';
+import {mkdir,readFile,writeFile} from 'node:fs/promises';
+import path from 'node:path';
+import {pathToFileURL} from 'node:url';
+import {spawnSync} from 'node:child_process';
+const require=createRequire(import.meta.url);
+const {chromium}=require(process.env.PLAYWRIGHT_MODULE||path.resolve('out/browser-tools/node_modules/playwright'));
+const python=process.env.PROJECT_PYTHON||'python';
+const config=JSON.parse(await readFile('scripts/browser-scenario.json','utf8'));
+const run=path.resolve('out/browser-'+Date.now());
+const analysis=run+'/analysis', reviewed=run+'/reviewed';
+function command(args){const r=spawnSync(python,['-m',config.package,...args],{encoding:'utf8'});if(r.status!==0)throw Error(r.stdout+r.stderr);}
+command([...config.args,'--out',analysis]);
+const browser=await chromium.launch({headless:true});
+const page=await browser.newPage({viewport:{width:1440,height:1000}});
+const errors=[];page.on('pageerror',e=>errors.push(e.message));
+await page.goto(pathToFileURL(analysis+'/review.html').href);
+await page.getByRole('heading',{level:1}).waitFor();
+const rows=page.locator('[data-finding]'), count=await rows.count();
+if(!count)throw Error('Expected realistic sample findings');
+await mkdir('docs/images',{recursive:true});
+await page.screenshot({path:'docs/images/review.png'});
+await page.setViewportSize({width:390,height:844});
+await page.screenshot({path:run+'/mobile.png'});
+if(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth))throw Error('Mobile horizontal overflow');
+await page.setViewportSize({width:1440,height:1000});
+await page.locator('#filter').fill('zzzz-no-match');
+if(await page.locator('[data-finding]:visible').count())throw Error('Filter failed');
+await page.locator('#filter').fill('');
+await page.locator('#actor').fill('SYNTHETIC responsible reviewer');
+await page.locator('#basis').fill('SYNTHETIC review of source evidence, configuration and all findings.');
+await page.getByRole('button',{name:'Download review decisions',exact:true}).click();
+if(!(await page.locator('#status').textContent()).startsWith('Review every'))throw Error('Incomplete decisions accepted');
+for(let i=0;i<count;i++){
+ const row=rows.nth(i);await row.locator('[data-disposition]').selectOption(i===0?'corrected':'confirmed');
+ await row.locator('[data-note]').fill('SYNTHETIC review; original evidence remains unchanged.');
+ if(i===0)await row.locator('[data-correction]').fill('SYNTHETIC corrected assessment for this finding.');
+}
+const pending=page.waitForEvent('download');
+await page.getByRole('button',{name:'Download review decisions',exact:true}).click();
+const download=await pending;await download.saveAs(run+'/decisions.json');
+command(['finalize',analysis,'--decisions',run+'/decisions.json','--out',reviewed]);
+command(['verify',reviewed]);
+await page.goto(pathToFileURL(reviewed+'/report.html').href);
+if(!(await page.getByText('review-complete',{exact:true}).count()))throw Error('Final status missing');
+if(await page.getByRole('button',{name:'Download review decisions'}).count())throw Error('Final report remained editable');
+if(!(await page.getByText('SYNTHETIC corrected assessment for this finding.',{exact:false}).count()))throw Error('Correction overlay missing');
+if(errors.length)throw Error(errors.join('\n'));
+const result={synthetic:true,findings:count,passed:['analysis report','desktop/mobile render','filter','incomplete review refused','decision download','finalize','verified final export','correction overlay','no page errors']};
+await writeFile(run+'/browser-result.json',JSON.stringify(result,null,2));
+await browser.close();console.log(JSON.stringify(result));
