@@ -6,7 +6,7 @@ import re
 from datetime import date
 from typing import Literal
 
-from pydantic import Field, StrictBool, model_validator
+from pydantic import Field, StrictBool, StrictInt, model_validator
 
 from .audit import Strict, check_span, finding
 
@@ -15,8 +15,8 @@ MEDIA = {"print", "web", "social", "paid-advertising", "broadcast", "internal"}
 
 
 class Evidence(Strict):
-    start: int = Field(ge=0)
-    end: int = Field(gt=0)
+    start: StrictInt = Field(ge=0)
+    end: StrictInt = Field(gt=0)
     quote: str = Field(min_length=1)
     locator: str = Field(min_length=1)
 
@@ -25,6 +25,22 @@ class Term(Strict):
     kind: Literal["fixed", "perpetual", "unknown"]
     start: date | None = None
     end: date | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def literal_dates(cls, value):
+        if isinstance(value, dict):
+            for key in ("start", "end"):
+                item = value.get(key)
+                if (
+                    item is not None
+                    and not isinstance(item, date)
+                    and (not isinstance(item, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", item))
+                ):
+                    raise ValueError(
+                        "Contract dates must be literal ISO dates, not timestamps or numbers"
+                    )
+        return value
 
     @model_validator(mode="after")
     def shape(self):

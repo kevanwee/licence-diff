@@ -5,7 +5,7 @@
     "errors": "0",
     "failures": "0",
     "skipped": "0",
-    "tests": "30"
+    "tests": "34"
   },
   "browser": {
     "synthetic": true,

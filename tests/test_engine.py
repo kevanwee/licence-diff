@@ -97,3 +97,19 @@ def test_confirmed_reading_requires_reviewer():
     raw["grants"][0]["interpretation"] = "human-confirmed"
     with pytest.raises(ValueError, match="reviewer"):
         RightsRegister.model_validate(raw)
+
+
+@pytest.mark.parametrize("value", [0, False, "2027-01-01T00:00:00Z"])
+def test_contract_dates_are_not_coerced_from_timestamps(value):
+    from licence_diff.engine import Term
+
+    with pytest.raises(ValueError, match="literal ISO"):
+        Term.model_validate({"kind": "fixed", "start": value, "end": "2027-12-31"})
+
+
+def test_boolean_evidence_offset_refused():
+    records, _ = registers()
+    raw = records[0].model_dump(mode="json")
+    raw["grants"][0]["evidence"]["id"]["start"] = True
+    with pytest.raises(ValueError):
+        RightsRegister.model_validate(raw)
