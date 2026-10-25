@@ -1,0 +1,57 @@
+SYNTHETIC MULTIMEDIA MASTER LICENCE — revised schedule and qualifications
+
+Grant: photos
+Work: Photos collection
+Licensor: Rights holder
+Licensee: Publisher
+Rights: reproduce; display
+Territories: APAC
+Media: digital
+Exclusive: no
+Sublicensing: no
+Term: 2027-01-01 to 2027-12-31
+Restrictions: Attribution required
+Definition Work: Final approved works only
+
+Grant: illustrations
+Work: Illustrations collection
+Licensor: Rights holder
+Licensee: Publishing affiliate
+Rights: reproduce; distribute; adapt; communicate
+Territories: SG; US
+Media: print; web; paid-advertising
+Exclusive: yes
+Sublicensing: yes
+Term: perpetual
+Restrictions: Attribution required; Training subject to approval
+Definition Work: Final works and editable working files
+
+Notwithstanding the schedule, model training requires separate written approval.
+
+Grant: archive
+Work: Archive collection
+Licensor: Rights holder
+Licensee: Publisher
+Rights: reproduce
+Territories: SG
+Media: internal
+Exclusive: no
+Sublicensing: no
+Term: perpetual
+Restrictions: Attribution required
+Definition Work: Final approved works only
+
+Archive access remains subject to pending third-party confidentiality restrictions.
+
+Grant: audio
+Work: Audio collection
+Licensor: Rights holder
+Licensee: Publisher
+Rights: perform; communicate
+Territories: SG; MY
+Media: broadcast
+Exclusive: no
+Sublicensing: no
+Term: 2028-01-01 to 2028-06-30
+Restrictions: Attribution required
+Definition Work: Final approved works only

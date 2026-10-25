@@ -14,6 +14,8 @@ from typing import Literal
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, StrictBool, model_validator
 
+from . import __version__
+
 
 class Strict(BaseModel):
     model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
@@ -137,7 +139,7 @@ def _safe_name(name):
 def bundle(output, report, snapshots, exports=None):
     report = {
         "schema_version": "1",
-        "engine_version": "0.1.0",
+        "engine_version": __version__,
         "review_status": "unreviewed",
         **report,
     }
@@ -172,7 +174,7 @@ def bundle(output, report, snapshots, exports=None):
         _safe_name(name)
     body = {
         "tool": report["tool"],
-        "version": "0.1.0",
+        "version": __version__,
         "files": {name: digest(raw) for name, raw in sorted(data.items())},
     }
     fingerprint = digest(canonical(body))
@@ -207,7 +209,7 @@ def verify(directory):
         return receipt, report
     record = read_json(directory / "bundle.json")
     if (
-        record["body"]["version"] != "0.1.0"
+        record["body"]["version"] != __version__
         or digest(canonical(record["body"])) != record["digest"]
     ):
         raise ValueError("Package fingerprint changed or engine is unsupported")
@@ -316,7 +318,7 @@ def sarif(report):
                 "tool": {
                     "driver": {
                         "name": report["tool"],
-                        "version": "0.1.0",
+                        "version": __version__,
                         "rules": [{"id": rule} for rule in rules],
                     }
                 },

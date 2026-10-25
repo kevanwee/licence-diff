@@ -11,10 +11,11 @@ from pathlib import Path
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--wheel", type=Path, required=True)
+    parser.add_argument("--scenario", default="scripts/browser-scenario.json")
     args = parser.parse_args()
     wheel = args.wheel.resolve()
     root = Path(__file__).resolve().parents[1]
-    config = json.loads((root / "scripts/browser-scenario.json").read_text(encoding="utf-8"))
+    config = json.loads((root / args.scenario).read_text(encoding="utf-8"))
     with tempfile.TemporaryDirectory(prefix="standalone-wheel-") as temporary:
         directory = Path(temporary)
         env = directory / "env"
@@ -40,16 +41,19 @@ def main():
         decision = {"schema_version": "1", "package_digest": record["digest"],
                     "actor": "SYNTHETIC wheel-test reviewer", "basis": "SYNTHETIC full-journey verification",
                     "reviewed_at": "2026-10-25T12:00:00+08:00", "synthetic": True,
-                    "findings": {row["id"]: {"disposition": "confirmed", "note": "SYNTHETIC test decision", "correction": None}
+                    "findings": {row["id"]: {"disposition": "needs-information" if row["rule"] in config.get("pending_rules", []) else "confirmed", "note": "SYNTHETIC test decision", "correction": None}
                                  for row in report["findings"]}}
         (directory / "decisions.json").write_text(json.dumps(decision), encoding="utf-8")
         command(["-m", config["package"], "finalize", "analysis", "--decisions", "decisions.json",
                  "--out", "reviewed"])
         command(["-m", config["package"], "verify", "reviewed"])
         assert (directory / "reviewed/report.html").is_file()
+        final = json.loads((directory / "reviewed/report.json").read_bytes())
+        has_pending = any(row["rule"] in config.get("pending_rules", []) for row in report["findings"])
+        assert final["review_status"] == ("needs-information" if has_pending else "review-complete")
         print(json.dumps({"package": config["package"], "wheel_install": "passed",
                           "independent_environment": True, "analysis_review_export": "passed",
-                          "synthetic": True, "findings": len(report["findings"])}))
+                          "synthetic": True, "findings": len(report["findings"]), "scenario": args.scenario}))
 
 
 if __name__ == "__main__":
