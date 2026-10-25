@@ -5,7 +5,7 @@
     "errors": "0",
     "failures": "0",
     "skipped": "0",
-    "tests": "34"
+    "tests": "39"
   },
   "browser": {
     "synthetic": true,
@@ -30,5 +30,7 @@
     "Supplied declarations and geometry are not independently verified",
     "Source evidence does not establish legal interpretation",
     "Reviewer identity and authority are supplied attestations"
-  ]
+  ],
+  "engine_version": "0.1.1",
+  "complex_matter": "See complex-verification.json"
 }

@@ -1,0 +1,38 @@
+{
+  "synthetic": true,
+  "oracle": "Manually enumerated recorded-rights deltas; qualifications remain unresolved legal judgments",
+  "before_grants": 4,
+  "after_grants": 4,
+  "added": [
+    "audio"
+  ],
+  "removed": [
+    "translation"
+  ],
+  "unchanged": [
+    "archive"
+  ],
+  "delta_fields": [
+    "illustrations.licensee",
+    "illustrations.rights",
+    "illustrations.territories",
+    "illustrations.media",
+    "illustrations.exclusive",
+    "illustrations.sublicensing",
+    "illustrations.term",
+    "illustrations.restrictions",
+    "illustrations.definitions",
+    "photos.territories",
+    "photos.media"
+  ],
+  "unknowns": [
+    "after.photos.territories",
+    "after.photos.media"
+  ],
+  "required_qualification_quotes": [
+    "Notwithstanding the schedule, model training requires separate written approval.",
+    "Archive access remains subject to pending third-party confidentiality restrictions."
+  ],
+  "territory_direction": "mixed additions and removals",
+  "review_status": "needs-information"
+}

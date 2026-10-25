@@ -7,7 +7,7 @@ import {spawnSync} from 'node:child_process';
 const require=createRequire(import.meta.url);
 const {chromium}=require(process.env.PLAYWRIGHT_MODULE||path.resolve('out/browser-tools/node_modules/playwright'));
 const python=process.env.PROJECT_PYTHON||'python';
-const config=JSON.parse(await readFile('scripts/browser-scenario.json','utf8'));
+const config=JSON.parse(await readFile(process.env.BROWSER_SCENARIO||'scripts/browser-scenario.json','utf8'));
 const run=path.resolve('out/browser-'+Date.now());
 const analysis=run+'/analysis', reviewed=run+'/reviewed';
 function command(args){const r=spawnSync(python,['-m',config.package,...args],{encoding:'utf8'});if(r.status!==0)throw Error(r.stdout+r.stderr);}
@@ -20,7 +20,7 @@ await page.getByRole('heading',{level:1}).waitFor();
 const rows=page.locator('[data-finding]'), count=await rows.count();
 if(!count)throw Error('Expected realistic sample findings');
 await mkdir('docs/images',{recursive:true});
-await page.screenshot({path:'docs/images/review.png'});
+await page.screenshot({path:config.screenshot||'docs/images/review.png'});
 await page.setViewportSize({width:390,height:844});
 await page.screenshot({path:run+'/mobile.png'});
 if(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth))throw Error('Mobile horizontal overflow');
@@ -32,10 +32,15 @@ await page.locator('#actor').fill('SYNTHETIC responsible reviewer');
 await page.locator('#basis').fill('SYNTHETIC review of source evidence, configuration and all findings.');
 await page.getByRole('button',{name:'Download review decisions',exact:true}).click();
 if(!(await page.locator('#status').textContent()).startsWith('Review every'))throw Error('Incomplete decisions accepted');
+const report=JSON.parse(await readFile(analysis+'/report.json','utf8'));
+let corrected=false,pendingCount=0;
 for(let i=0;i<count;i++){
- const row=rows.nth(i);await row.locator('[data-disposition]').selectOption(i===0?'corrected':'confirmed');
+ const row=rows.nth(i);const pending=(config.pending_rules||[]).includes(report.findings[i].rule);
+ const disposition=pending?'needs-information':!corrected?'corrected':'confirmed';
+ if(pending)pendingCount++;
+ await row.locator('[data-disposition]').selectOption(disposition);
  await row.locator('[data-note]').fill('SYNTHETIC review; original evidence remains unchanged.');
- if(i===0)await row.locator('[data-correction]').fill('SYNTHETIC corrected assessment for this finding.');
+ if(disposition==='corrected'){await row.locator('[data-correction]').fill('SYNTHETIC corrected assessment for this finding.');corrected=true;}
 }
 const pending=page.waitForEvent('download');
 await page.getByRole('button',{name:'Download review decisions',exact:true}).click();
@@ -43,10 +48,10 @@ const download=await pending;await download.saveAs(run+'/decisions.json');
 command(['finalize',analysis,'--decisions',run+'/decisions.json','--out',reviewed]);
 command(['verify',reviewed]);
 await page.goto(pathToFileURL(reviewed+'/report.html').href);
-if(!(await page.getByText('review-complete',{exact:true}).count()))throw Error('Final status missing');
+if(!(await page.getByText(pendingCount?'needs-information':'review-complete',{exact:true}).count()))throw Error('Final status missing');
 if(await page.getByRole('button',{name:'Download review decisions'}).count())throw Error('Final report remained editable');
 if(!(await page.getByText('SYNTHETIC corrected assessment for this finding.',{exact:false}).count()))throw Error('Correction overlay missing');
 if(errors.length)throw Error(errors.join('\n'));
-const result={synthetic:true,findings:count,passed:['analysis report','desktop/mobile render','filter','incomplete review refused','decision download','finalize','verified final export','correction overlay','no page errors']};
+const result={synthetic:true,findings:count,pending:pendingCount,passed:['analysis report','desktop/mobile render','filter','incomplete review refused','decision download','finalize','verified final export','correction overlay','no page errors']};
 await writeFile(run+'/browser-result.json',JSON.stringify(result,null,2));
 await browser.close();console.log(JSON.stringify(result));

@@ -159,3 +159,11 @@ downloads a synthetic corrected decision, finalizes it and verifies the exported
 It creates a fresh namespace under `out/` and refreshes the README screenshot.
 For a standalone distribution check, build a wheel and run `scripts/smoke_wheel.py
 --wheel PATH_TO_WHEEL`. That test creates a clean environment outside the source tree.
+
+
+## Harder subject matter
+
+A larger synthetic matter, independent expected-result ledger and complete review/export
+rehearsal are included. See [complex matter verification](docs/COMPLEX-TEST.md) for results,
+known limitations and the one-command walkthrough. Version 0.1.1 preserves earlier
+released artifacts; use the corresponding engine release to verify older analysis packages.

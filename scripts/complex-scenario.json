@@ -1,0 +1,16 @@
+{
+  "package": "licence_diff",
+  "args": [
+    "compare",
+    "examples/multimedia-licence/before.txt",
+    "examples/multimedia-licence/after.txt",
+    "--matter",
+    "Multimedia licensing",
+    "--synthetic"
+  ],
+  "pending_rules": [
+    "unknown-rights",
+    "unclassified-text"
+  ],
+  "screenshot": "docs/images/complex-review.png"
+}
