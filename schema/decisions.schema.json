@@ -1,0 +1,95 @@
+{
+  "$defs": {
+    "FindingDecision": {
+      "additionalProperties": false,
+      "properties": {
+        "disposition": {
+          "enum": [
+            "confirmed",
+            "dismissed",
+            "corrected",
+            "needs-information"
+          ],
+          "title": "Disposition",
+          "type": "string"
+        },
+        "note": {
+          "minLength": 8,
+          "pattern": "\\S",
+          "title": "Note",
+          "type": "string"
+        },
+        "correction": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Correction"
+        }
+      },
+      "required": [
+        "disposition",
+        "note"
+      ],
+      "title": "FindingDecision",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1",
+      "default": "1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "package_digest": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Package Digest",
+      "type": "string"
+    },
+    "actor": {
+      "minLength": 1,
+      "pattern": "\\S",
+      "title": "Actor",
+      "type": "string"
+    },
+    "basis": {
+      "minLength": 8,
+      "pattern": "\\S",
+      "title": "Basis",
+      "type": "string"
+    },
+    "reviewed_at": {
+      "format": "date-time",
+      "title": "Reviewed At",
+      "type": "string"
+    },
+    "synthetic": {
+      "title": "Synthetic",
+      "type": "boolean"
+    },
+    "findings": {
+      "additionalProperties": {
+        "$ref": "#/$defs/FindingDecision"
+      },
+      "title": "Findings",
+      "type": "object"
+    }
+  },
+  "required": [
+    "package_digest",
+    "actor",
+    "basis",
+    "reviewed_at",
+    "synthetic",
+    "findings"
+  ],
+  "title": "Decisions",
+  "type": "object"
+}

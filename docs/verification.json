@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-25",
+  "synthetic": true,
+  "tests": {
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "30"
+  },
+  "browser": {
+    "synthetic": true,
+    "findings": 12,
+    "passed": [
+      "analysis report",
+      "desktop/mobile render",
+      "filter",
+      "incomplete review refused",
+      "decision download",
+      "finalize",
+      "verified final export",
+      "correction overlay",
+      "no page errors"
+    ]
+  },
+  "lint": "passed",
+  "wheel_build": "passed",
+  "clean_wheel_install": "passed: isolated environment; full analysis/review/export; no sibling packages installed",
+  "hosted_ci": "See the repository Actions checks; the README badge reflects the current result.",
+  "limitations": [
+    "Supplied declarations and geometry are not independently verified",
+    "Source evidence does not establish legal interpretation",
+    "Reviewer identity and authority are supplied attestations"
+  ]
+}

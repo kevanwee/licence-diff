@@ -1,0 +1,11 @@
+{
+  "package": "licence_diff",
+  "args": [
+    "compare",
+    "examples/campaign-licence/before.txt",
+    "examples/campaign-licence/after.txt",
+    "--matter",
+    "Campaign illustrations",
+    "--synthetic"
+  ]
+}

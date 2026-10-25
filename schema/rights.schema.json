@@ -1,0 +1,284 @@
+{
+  "$defs": {
+    "Evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "minimum": 0,
+          "title": "Start",
+          "type": "integer"
+        },
+        "end": {
+          "exclusiveMinimum": 0,
+          "title": "End",
+          "type": "integer"
+        },
+        "quote": {
+          "minLength": 1,
+          "title": "Quote",
+          "type": "string"
+        },
+        "locator": {
+          "minLength": 1,
+          "title": "Locator",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start",
+        "end",
+        "quote",
+        "locator"
+      ],
+      "title": "Evidence",
+      "type": "object"
+    },
+    "Grant": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[a-z][a-z0-9-]{0,62}$",
+          "title": "Id",
+          "type": "string"
+        },
+        "work": {
+          "minLength": 1,
+          "title": "Work",
+          "type": "string"
+        },
+        "licensor": {
+          "minLength": 1,
+          "title": "Licensor",
+          "type": "string"
+        },
+        "licensee": {
+          "minLength": 1,
+          "title": "Licensee",
+          "type": "string"
+        },
+        "rights": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Rights"
+        },
+        "territories": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Territories"
+        },
+        "media": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Media"
+        },
+        "exclusive": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Exclusive"
+        },
+        "sublicensing": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Sublicensing"
+        },
+        "term": {
+          "$ref": "#/$defs/Term"
+        },
+        "restrictions": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Restrictions"
+        },
+        "definitions": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Definitions",
+          "type": "object"
+        },
+        "evidence": {
+          "additionalProperties": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "title": "Evidence",
+          "type": "object"
+        },
+        "interpretation": {
+          "default": "proposed",
+          "enum": [
+            "proposed",
+            "human-confirmed"
+          ],
+          "title": "Interpretation",
+          "type": "string"
+        },
+        "reviewer": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reviewer"
+        }
+      },
+      "required": [
+        "id",
+        "work",
+        "licensor",
+        "licensee",
+        "rights",
+        "territories",
+        "media",
+        "exclusive",
+        "sublicensing",
+        "term",
+        "restrictions",
+        "evidence"
+      ],
+      "title": "Grant",
+      "type": "object"
+    },
+    "Term": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "fixed",
+            "perpetual",
+            "unknown"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "start": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start"
+        },
+        "end": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "End"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "Term",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1",
+      "default": "1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "matter": {
+      "minLength": 1,
+      "title": "Matter",
+      "type": "string"
+    },
+    "synthetic": {
+      "default": false,
+      "title": "Synthetic",
+      "type": "boolean"
+    },
+    "source_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Source Sha256",
+      "type": "string"
+    },
+    "grants": {
+      "items": {
+        "$ref": "#/$defs/Grant"
+      },
+      "title": "Grants",
+      "type": "array"
+    },
+    "unclassified": {
+      "items": {
+        "$ref": "#/$defs/Evidence"
+      },
+      "title": "Unclassified",
+      "type": "array"
+    }
+  },
+  "required": [
+    "matter",
+    "source_sha256",
+    "grants"
+  ],
+  "title": "RightsRegister",
+  "type": "object"
+}
